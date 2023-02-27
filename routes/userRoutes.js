@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // importing user route
-userRoute = require('./controllers/usersController.js');
+userRoute = require('../controllers/usersController.js');
 
 // mapping user controller onto user route
 router.get("/", userRoute.userController)

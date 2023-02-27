@@ -9,8 +9,8 @@
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 5000;
-const mongoose = require("mongoose");
-const Post = require("./pagination/posts.js");
+const mongoose = reuqire("mongoose");
+const Post = require("./posts.js");
 
 mongoose.connect("mongodb://localhost/pagination");
 // to connect to the database
@@ -36,8 +36,10 @@ db.once("open", async () => {
     Post.create({ name: "Post 13" }),
     Post.create({ name: "Post 14" }),
     Post.create({ name: "Post 15" }),
-    Post.create({ name: "Post 16" }),
-  ]).then(() => console.log("Added Posts"));
+    Post.create({ name: "Post 16" })
+  ]).then(() =>
+    console.log("Added Posts")
+  );
 });
 
 app.get("/posts", paginatedResults(Post), (req, res) => {
@@ -45,7 +47,7 @@ app.get("/posts", paginatedResults(Post), (req, res) => {
 });
 
 function paginatedResults(model) {
-  return async(req, res, next) => {
+  return (req, res, next) => {
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit);
 
@@ -63,25 +65,18 @@ function paginatedResults(model) {
       };
     }
 
-    // results.resultModel = model.slice(startIndex, endIndex);
+    results.resultModel = model.slice(startIndex, endIndex);
 
-    // changing these results according to the db
-    try {
-      results.results = await model.find().limit(limit).skip(startIndex).exec();
-      // setting results to res.paginatedResults so that we can use it later on
-      res.paginatedResults = results;
-      next();
-    } catch (error) {
-        res.status(500).json({message : e.message})
-    }
-
-    // if (endIndex < model.length) {
-        if (endIndex < await model.countDocuments().exec()){
+    if (endIndex < model.length) {
       results.next = {
         page: page + 1,
         limit: limit,
       };
     }
+
+    // setting results to res.paginatedResults so that we can use it later on
+    res.paginatedResults = results;
+    next();
   };
 }
 
